@@ -10,14 +10,14 @@ p,
 span {
   font-weight: 600;
   color: grey;
-  font-size: 6vw;
+  font-size: 3vw;
 }
 
 #location-input,
 .variable {
   font-weight: 600;
   color: black;
-  font-size: 7vw;
+  font-size: 4vw;
 }
 
 #location-input {
