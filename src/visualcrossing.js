@@ -175,15 +175,23 @@ weatherTypes = {
   },
 };
 
+let tempUnit = "F";
+
 const weatherDescriptionText = document.getElementById(
   "weather-description-text"
 );
 const weatherQuipText = document.getElementById("weather-quip-text");
+const tempText = document.getElementById("temp");
 const feelsLikeText = document.getElementById("feels-like-temp");
+const locationText = document.getElementById("location");
+const humidityText = document.getElementById("humidity");
+const errorContainer = document.getElementById("error-container");
+const errorMessage = document.getElementById("error-message");
+const locationInput = document.getElementById("location-input");
+const submitLocationBtn = document.getElementById("submit-location");
+const convertBtn = document.getElementById("convert");
 
 console.log("visual crossing loaded");
-
-const location = "Montreal";
 
 async function getWeather(_location) {
   const todaysDate = new Date();
@@ -192,26 +200,115 @@ async function getWeather(_location) {
   const yyyy = todaysDate.getFullYear();
   const todaysDateFormatted = `${yyyy}-${mm}-${dd}`;
 
-  const response = await fetch(
-    `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${todaysDateFormatted}/${todaysDateFormatted}?key=${VisualCrossingAPIKey}&lang=id`
-  );
-  const weatherData = await response.json();
-  console.log(weatherData.currentConditions);
+  try {
+    const response = await fetch(
+      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${_location}/${todaysDateFormatted}/${todaysDateFormatted}?key=${VisualCrossingAPIKey}&lang=id`
+    );
 
-  if (weatherTypes.hasOwnProperty(weatherData.currentConditions.conditions)) {
-    const weatherDescription =
-      weatherTypes[`${weatherData.currentConditions.conditions}`][
-        "description"
-      ];
-    const weatherQuip =
-      weatherTypes[`${weatherData.currentConditions.conditions}`]["quip"];
+    if (!response.ok) {
+      console.log("Invalid location");
+      errorMessage.textContent =
+        locationInput.value + " is not a valid location";
+      resetWeather();
+      errorContainer.classList.remove("hidden");
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      errorContainer.classList.add("hidden");
+    } else {
+      const weatherData = await response.json();
+      console.log(weatherData);
+      if (
+        !weatherData.currentConditions ||
+        !weatherData.currentConditions.conditions
+      ) {
+        errorMessage.textContent = "location not supported!";
+        errorContainer.classList.remove("hidden");
+        resetWeather();
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        errorContainer.classList.add("hidden");
+      } else if (
+        weatherTypes.hasOwnProperty(weatherData.currentConditions.conditions)
+      ) {
+        const weatherDescription =
+          weatherTypes[`${weatherData.currentConditions.conditions}`][
+            "description"
+          ];
+        const weatherQuip =
+          weatherTypes[`${weatherData.currentConditions.conditions}`]["quip"];
 
-    const feelsLike = weatherData.currentConditions.feelslike;
+        const temp = weatherData.currentConditions.temp;
+        const feelsLike = weatherData.currentConditions.feelslike;
+        const humidity = weatherData.currentConditions.humidity;
 
-    weatherDescriptionText.textContent = weatherDescription.toLowerCase() + ".";
-    weatherQuipText.textContent = weatherQuip;
-    feelsLikeText.textContent = feelsLike;
+        weatherDescriptionText.textContent = weatherDescription.toLowerCase();
+        // locationText.textContent = location + ".";
+        weatherQuipText.textContent = weatherQuip;
+        feelsLikeText.textContent = feelsLike + "°F";
+        tempText.textContent = temp + "°F";
+        humidityText.textContent = humidity + "%!";
+        convertBtn.classList.remove("hidden");
+      }
+    }
+  } catch (error) {
+    console.log("uhoh! Error");
+    console.log(response);
+    console.log(error);
   }
 }
 
-getWeather(location);
+locationInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const target = e.target;
+    getWeather(target.value);
+  }
+});
+
+function resetWeather() {
+  locationInput.value = "";
+  weatherDescriptionText.textContent = "_________";
+  weatherQuipText.textContent = "_____________";
+  tempText.textContent = "__";
+  feelsLikeText.textContent = "__";
+  humidityText.textContent = "__";
+  convertBtn.classList.add("hidden");
+}
+
+submitLocationBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  getWeather(locationInput.value);
+});
+
+convertBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  // Convert the text content to a number by removing the "°" symbol and using parseFloat
+  const oldTemp = parseFloat(tempText.textContent.split("°")[0]);
+  const oldFeelsLikeTemp = parseFloat(feelsLikeText.textContent.split("°")[0]);
+
+  if (tempUnit === "F") {
+    // Convert Fahrenheit to Celsius and round to 0 decimal places
+    const newTemp = ((oldTemp - 32) * (5 / 9)).toFixed(0);
+    const newFeelsLikeTemp = ((oldFeelsLikeTemp - 32) * (5 / 9)).toFixed(0);
+
+    // Update the text content with the new temperatures in Celsius
+    tempText.textContent = newTemp + "°C";
+    feelsLikeText.textContent = newFeelsLikeTemp + "°C";
+
+    // Update the unit for future conversions
+    tempUnit = "C";
+    convertBtn.textContent = "I'd prefer fahrenheit";
+  } else {
+    // Convert Celsius to Fahrenheit and round to 0 decimal places
+    const newTemp = (oldTemp * (9 / 5) + 32).toFixed(0);
+    const newFeelsLikeTemp = (oldFeelsLikeTemp * (9 / 5) + 32).toFixed(0);
+
+    // Update the text content with the new temperatures in Fahrenheit
+    tempText.textContent = newTemp + "°F";
+    feelsLikeText.textContent = newFeelsLikeTemp + "°F";
+
+    // Update the unit for future conversions
+    tempUnit = "F";
+
+    convertBtn.textContent = "I'd prefer celsius";
+  }
+});

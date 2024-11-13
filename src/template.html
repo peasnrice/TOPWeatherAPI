@@ -6,18 +6,31 @@
     <title>TOP WEATHER API PROJECT</title>
   </head>
   <body>
-    <div id="container">
-      <p>
-        <span>It is </span>
-        <span id="weather-description-text"></span>
-        <span id="weather-quip-text"></span>
-      </p>
-      <p>
-        <span>It's </span>
-        <span id="temp"></span>
-        <span>but it feels closer to</span>
-        <span id="feels-like-temp"></span>
-      </p>
+      <div id="error-container" class="hidden">
+        <p id="error-message">ERROR</p>
+      </div>
+      <div id="container">
+        <p>
+          <span>It is </span>
+          <span id="weather-description-text" class="variable">_________</span>
+          <span>in</span>
+          <form action="submit-country" method="post">
+          <input type="text" name="location-input" id="location-input">
+          <button type="button" id="submit-location">Enter</button>
+          </form>
+          <span id="weather-quip-text">_____________</span>
+        </p>
+        <p>
+          <span>It's </span>
+          <span id="temp" class="variable"></span>
+          <span>but it feels closer to</span>
+          <span id="feels-like-temp" class="variable">__</span>
+        </p>
+        <p>
+          <span>Humidity is at </span>
+          <span id="humidity" class="variable">__</span>
+        </p>
+        <button type="button" id="convert" class="hidden">I'd prefer Celcius</button>
     </div>
   </body>
 </html>

@@ -1,0 +1,77 @@
+* {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+body {
+  padding: 20px;
+}
+
+p,
+span {
+  font-weight: 600;
+  color: grey;
+  font-size: 6vw;
+}
+
+#location-input,
+.variable {
+  font-weight: 600;
+  color: black;
+  font-size: 7vw;
+}
+
+#location-input {
+  border: 1px solid black;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+#error-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: red;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1;
+  width: 50%;
+  text-align: center;
+}
+
+#error-container > p {
+  color: white;
+}
+
+.hidden {
+  display: none;
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+}
+
+#convert {
+  align-self: center;
+  width: 50%;
+}
+
+button {
+  height: 7vw;
+  border-radius: 20px;
+  border: 1px solid black;
+}
+
+button:active {
+  height: 7vw;
+  border-radius: 20px;
+  border: 2px solid black;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
